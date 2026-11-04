@@ -1,177 +1,191 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KINSLEY'S PERSONAL SPACE</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    body, html {
-      width: 100%;
-      height: 100%;
-      background-color: #FFFFFF;
-      color: #000000;
-      font-family: 'Courier New', Courier, monospace;
-      overflow: hidden;
-      position: relative;
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kinsley's Personal Space</title>
 
-    /* 顶部标语 */
-    header {
-      position: absolute;
-      top: 40px;
-      width: 100%;
-      text-align: center;
-      letter-spacing: 0.35em;
-      font-size: 13px;
-      font-weight: 600;
-      z-index: 10;
-      text-transform: uppercase;
-    }
+<style>
+:root {
+  --black: #111;
+  --white: #fff;
+  --gray: #666;
+  --futura-font: Futura, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --typewriter-font: 'Courier Prime', Courier, 'Courier New', monospace;
+}
 
-    /* 雪人及倒计时容器 */
-    .snowman-container {
-      position: absolute;
-      top: 46%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      z-index: 5;
-    }
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#fff;color:var(--black)}
 
-    /* 极简解构风格雪人框 */
-    .snowman-head {
-      width: 140px;
-      height: 140px;
-      border: 1px solid #000000;
-      border-radius: 50%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: -15px;
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(2px);
-    }
+/* 4. 全局应用 Futura 字体 */
+body {
+  font-family: var(--futura-font);
+  overflow-x: hidden;
+  letter-spacing: 0.02em;
+}
 
-    .snowman-body {
-      width: 210px;
-      height: 210px;
-      border: 1px solid #000000;
-      border-radius: 50%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(2px);
-    }
+#snow {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
 
-    .timer-val {
-      font-size: 15px;
-      font-weight: bold;
-      letter-spacing: 0.1em;
-    }
+/* 3. 蓝色雪花与高对比度可见的圆球 */
+.flake {
+  position: absolute;
+  top: -30px;
+  left: var(--x);
+  opacity: var(--o);
+  color: #4a90e2;
+  font-size: var(--s);
+  animation: fall var(--t) linear var(--d) infinite;
+  user-select: none;
+}
+.flake.ball {
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  background: #333;
+  box-shadow: 0 0 3px rgba(0,0,0,0.25);
+}
 
-    .timer-label {
-      font-size: 9px;
-      margin-top: 4px;
-      letter-spacing: 0.2em;
-      color: #555555;
-      text-transform: uppercase;
-    }
+@keyframes fall {
+  to {
+    /* 1. 轨迹贯穿整页，落到页面最下边音乐播放器下方并消失 */
+    transform: translate3d(var(--drift), 115vh, 0) rotate(360deg);
+  }
+}
 
-    /* 画布（雪花与飘落字母） */
-    canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 2;
-      pointer-events: none;
-    }
+main {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  min-height: 100svh;
+  margin: auto;
+  padding: 32px 22px 38px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-    /* 底部播放器占位与沉积字母避让 */
-    footer {
-      position: absolute;
-      bottom: 25px;
-      width: 100%;
-      text-align: center;
-      font-size: 11px;
-      letter-spacing: 0.15em;
-      color: #666;
-      z-index: 10;
-    }
-  </style>
-</head>
-<body>
+/* 4. 顶部标题字体放大且采用 Futura */
+header {
+  font-family: var(--futura-font);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .22em;
+  text-align: center;
+  padding: 12px 0 22px;
+  color: #111;
+}
 
-  <header>KINSLEY'S PERSONAL SPACE</header>
+.scene {
+  position: relative;
+  width: 100%;
+  height: 560px;
+  overflow: hidden;
+}
 
-  <!-- 黑白解构雪人倒计时 -->
-  <div class="snowman-container">
-    <div class="snowman-head">
-      <div class="timer-val" id="hours-lived">000000:00:00</div>
-      <div class="timer-label">HOURS LIVED</div>
-    </div>
-    <div class="snowman-body">
-      <div class="timer-val" id="next-birthday">0000:00:00</div>
-      <div class="timer-label">NEXT BIRTHDAY</div>
-    </div>
-  </div>
+/* 雪人样式完全保持不变 */
+.snowman {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: 270px;
+  height: 340px;
+  transform: translate(-50%,-50%) scale(.82);
+  z-index: 3;
+}
 
-  <canvas id="snowCanvas"></canvas>
+.head, .ball {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 1.3px solid #222;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.96);
+}
 
-  <footer>
-    [ 01 / 22 ] Clair de Lune — Debussy
-  </footer>
+.head { top: 8px; width: 110px; height: 100px; }
 
-  <script>
-    // ------------------ 1. 倒计时逻辑 ------------------
-    // 出生时间（已生活小时）
-    const birthDate = new Date('2002-12-21T00:00:00');
-    // 下一次生日时间 (2026-12-21 23:55)
-    const nextBdayDate = new Date('2026-12-21T23:55:00');
+.upper {
+  top: 92px;
+  width: 180px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lower {
+  top: 215px;
+  width: 235px;
+  height: 205px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-    function updateTimers() {
-      const now = new Date();
+.hat {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: -4px;
+  width: 50px;
+  height: 40px;
+  transform: translateX(-50%) rotate(7deg);
+  background: #111;
+}
+.hat:after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: -10px;
+  width: 70px;
+  height: 5px;
+  background: #111;
+  border-radius: 50%;
+}
 
-      // 已生活总时长计算
-      const diffLivedSec = Math.floor((now - birthDate) / 1000);
-      const hoursLived = Math.floor(diffLivedSec / 3600);
-      const minsLived = Math.floor((diffLivedSec % 3600) / 60);
-      const secsLived = diffLivedSec % 60;
-      document.getElementById('hours-lived').innerText = 
-        `${hoursLived}:${String(minsLived).padStart(2, '0')}:${String(secsLived).padStart(2, '0')}`;
+.eye {
+  position: absolute;
+  top: 43px;
+  left: calc(50% - 15px);
+  width: 5px;
+  height: 5px;
+  background: #111;
+  border-radius: 50%;
+  box-shadow: 25px 0 #111;
+}
+.nose {
+  position: absolute;
+  top: 56px;
+  left: 50%;
+  width: 16px;
+  border-top: 1px solid #111;
+  transform: rotate(10deg);
+}
+.arm {
+  position: absolute;
+  top: 132px;
+  width: 65px;
+  border-top: 1px solid #111;
+}
+.arm.l { right: calc(50% + 70px); transform: rotate(34deg); }
+.arm.r { left: calc(50% + 70px); transform: rotate(-34deg); }
+.arm:after {
+  content: "";
+  position: absolute;
+  top: -7px;
+  left: 0;
+  width: 18px;
+  border-top: 1px solid #111;
+  transform: rotate(35deg);
+}
 
-      // 生日倒计时计算
-      const diffBdaySec = Math.max(0, Math.floor((nextBdayDate - now) / 1000));
-      const hoursBday = Math.floor(diffBdaySec / 3600);
-      const minsBday = Math.floor((diffBdaySec % 3600) / 60);
-      const secsBday = diffBdaySec % 60;
-      document.getElementById('next-birthday').innerText = 
-        `${hoursBday}:${String(minsBday).padStart(2, '0')}:${String(secsBday).padStart(2, '0')}`;
-    }
-    setInterval(updateTimers, 1000);
-    updateTimers();
-
-    // ------------------ 2. 雪花与字母下雪 Canvas ------------------
-    const canvas = document.getElementById('snowCanvas');
-    const ctx = canvas.getContext('2d');
-
-    let width = canvas.width = window.innerWidth;
-    let height = canvas.height = window.innerHeight;
-
-    window.addEventListener('resize', () => {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-    });
-
-    // 背景普通雪花粒子（保持稀疏与
+.timer {
+  width: 90%;
+  text-align: center;
+  white-space: nowrap;
+  z-index: 4
